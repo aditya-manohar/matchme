@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, flash, redirect, url_for
+from flask import Flask, render_template, request, flash, redirect, url_for,send_from_directory
 import os
 import time
 from deepface import DeepFace
@@ -80,4 +80,5 @@ def process():
                        match=best_match if best_match and best_match['score'] > 0 else None)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))  
+    app.run(host='0.0.0.0', port=port) 
