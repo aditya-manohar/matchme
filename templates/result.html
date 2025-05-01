@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MatchMe</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6C63FF;
+            --primary-dark: #5A52E0;
+            --text: #2D3748;
+            --light: #F7FAFC;
+            --gray: #E2E8F0;
+            --dark-gray: #718096;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: var(--text);
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .logo-container {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 100;
+        }
+
+        .logo-text {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(90deg, #6C63FF, #FF6B6B);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: 1px;
+        }
+
+        .logo-icon {
+            font-size: 28px;
+            background: linear-gradient(135deg, #6C63FF, #FF6B6B);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .results-container {
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .results-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .results-header {
+            padding: 25px;
+            text-align: center;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .results-header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin: 0;
+            color: var(--text);
+        }
+
+        .match-quality {
+            margin-top: 10px;
+        }
+
+        .quality-tag {
+            background: #4cc9f0;
+            color: white;
+            padding: 6px 18px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .quality-tag.neutral {
+            background: var(--dark-gray);
+        }
+
+        .photos-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            padding: 25px;
+        }
+
+        .photo-column {
+            padding: 15px;
+            text-align: center;
+        }
+
+        .photo-frame {
+            height: 350px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .photo-frame img {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            object-fit: cover;
+        }
+
+        .photo-label {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 15px;
+        }
+
+        .match-details {
+            padding: 0 25px 25px;
+            text-align: center;
+            /* border-top: 1px solid rgba(0, 0, 0, 0.05); */
+        }
+
+        .match-info {
+            margin-bottom: 25px;
+        }
+
+        .celebrity-name {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 10px;
+        }
+
+        .similarity-score {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .score-bar-container {
+            width: 100%;
+            max-width: 300px;
+            height: 10px;
+            background: var(--gray);
+            border-radius: 5px;
+            margin-bottom: 10px;
+            overflow: hidden;
+        }
+
+        .score-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), #4cc9f0);
+            border-radius: 5px;
+        }
+
+        .score-text {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .no-match {
+            padding: 30px;
+            text-align: center;
+        }
+
+        .no-match img {
+            width: 120px;
+            height: 120px;
+            opacity: 0.7;
+            margin-bottom: 20px;
+        }
+
+        .no-match h3 {
+            font-size: 20px;
+            color: var(--text);
+            margin-bottom: 10px;
+        }
+
+        .no-match p {
+            color: var(--dark-gray);
+            font-size: 15px;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            padding: 0 25px 25px;
+        }
+
+        .action-btn {
+            padding: 14px 28px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+        }
+
+        .try-again-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+        }
+
+        .try-again-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108, 99, 255, 0.3);
+        }
+
+        .share-btn {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            gap: 8px;
+        }
+
+        .share-btn:hover {
+            background: rgba(108, 99, 255, 0.05);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108, 99, 255, 0.1);
+        }
+
+        .share-btn svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        @media (max-width: 768px) {
+            .photos-container {
+                grid-template-columns: 1fr;
+            }
+
+            .photo-frame {
+                height: 300px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .action-btn {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .results-header h1 {
+                font-size: 24px;
+            }
+
+            .celebrity-name {
+                font-size: 20px;
+            }
+
+            .photo-label {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="logo-container">
+        <span class="logo-icon">🎭</span>
+        <span class="logo-text">MatchMe</span>
+    </div>
+    <div class="results-container">
+        <div class="results-card">
+            <div class="results-header">
+                <h1>Your Celebrity Match</h1>
+                <div class="match-quality">
+                    {% if match %}
+                    <span class="quality-tag">High Confidence Match</span>
+                    {% else %}
+                    <span class="quality-tag neutral">Possible Match</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="photos-container">
+                <div class="photo-column">
+                    <div class="photo-label">You</div>
+                    <div class="photo-frame">
+                        <img src="{{ user_image }}" alt="Your photo">
+                    </div>
+                </div>
+
+                <div class="photo-column">
+                    <div class="photo-label">Your Match</div>
+                    <div class="photo-frame">
+                        {% if match %}
+                        <img src="{{ match.path }}" alt="{{ match.name }}">
+                        {% else %}
+                        <div class="no-match">
+                            <img src="{{ url_for('static', filename='images/no-match.png') }}" alt="No match">
+                            <h3>No Strong Match Found</h3>
+                            <p>We couldn't find a celebrity with strong similarity</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            {% if match %}
+            <div class="match-details">
+                <div class="match-info">
+                    <div class="celebrity-name">You look like {{ match.name }}</div>
+                    <div class="similarity-score">
+                        <div class="score-bar-container">
+                            <div class="score-bar" style="width: {{ match.score }}%"></div>
+                        </div>
+                        <div class="score-text">{{ match.score }}% Similarity</div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="action-buttons">
+                <a href="/" class="action-btn try-again-btn">Try Another Photo</a>
+                {% if match %}
+                <button class="action-btn share-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+                        <polyline points="16 6 12 2 8 6"></polyline>
+                        <line x1="12" y1="2" x2="12" y2="15"></line>
+                    </svg>
+                    Share Results
+                </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

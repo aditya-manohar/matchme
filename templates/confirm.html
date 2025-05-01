@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MatchMe</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6C63FF;
+            --primary-dark: #5A52E0;
+            --text: #2D3748;
+            --light: #F7FAFC;
+            --gray: #E2E8F0;
+            --dark-gray: #718096;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        .logo-container {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 100;
+        }
+
+        .logo-text {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(90deg, #6C63FF, #FF6B6B);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: 1px;
+        }
+
+        .logo-icon {
+            font-size: 28px;
+            background: linear-gradient(135deg, #6C63FF, #FF6B6B);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .confirm-container {
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .confirm-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .confirm-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .confirm-header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text);
+            text-align: center;
+            flex-grow: 1;
+        }
+
+        .back-arrow a {
+            color: var(--primary);
+            font-size: 24px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .step-indicator {
+            font-size: 14px;
+            color: var(--dark-gray);
+            position: absolute;
+            right: 0;
+            top: -25px;
+        }
+
+        .photo-preview {
+            position: relative;
+            width: 100%;
+            height: 350px;
+            margin-bottom: 25px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--gray);
+        }
+
+        .photo-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            transition: transform 0.3s ease;
+            background-color: #f8f9fa;
+        }
+
+        .zoom-controls {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .zoom-btn {
+            width: 36px;
+            height: 36px;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .zoom-btn:hover {
+            background: rgba(0, 0, 0, 0.8);
+            transform: scale(1.05);
+        }
+
+        .confirm-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .confirm-btn {
+            width: 100%;
+            padding: 15px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+
+        .confirm-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108, 99, 255, 0.3);
+        }
+
+        .confirm-btn:disabled {
+            opacity: 0.8;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .change-photo {
+            text-align: center;
+            color: var(--primary);
+            font-size: 14px;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .change-photo:hover {
+            text-decoration: underline;
+        }
+
+        .confirm-loader {
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            display: none;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            .confirm-card {
+                padding: 20px;
+            }
+
+            .confirm-header h1 {
+                font-size: 20px;
+            }
+
+            .photo-preview {
+                height: 300px;
+            }
+
+            .logo-text {
+                font-size: 20px;
+            }
+
+            .logo-icon {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="logo-container">
+        <span class="logo-icon">🎭</span>
+        <span class="logo-text">MatchMe</span>
+    </div>
+
+    <div class="confirm-container">
+        <div class="confirm-card">
+            <div class="confirm-header">
+                <div class="back-arrow">
+                    <a href="/">←</a>
+                </div>
+                <h1>Confirm Selection</h1>
+                <div class="step-indicator">Step 2 of 3</div>
+            </div>
+
+            <div class="photo-preview">
+                <img src="{{ user_image }}" alt="Your photo" id="previewImage">
+                <div class="zoom-controls">
+                    <button class="zoom-btn" id="zoomIn">+</button>
+                    <button class="zoom-btn" id="zoomOut">-</button>
+                </div>
+            </div>
+
+            <div class="confirm-actions">
+                <form action="/process" method="POST">
+                    <input type="hidden" name="filepath" value="{{ user_image }}">
+                    <button type="submit" class="confirm-btn" id="processBtn">
+                        <span class="btn-text">Find My Match</span>
+                        <div class="confirm-loader" id="confirmLoader"></div>
+                    </button>
+                </form>
+                <a href="/" class="change-photo">Select Different Photo</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Zoom functionality
+        const zoomIn = document.getElementById('zoomIn');
+        const zoomOut = document.getElementById('zoomOut');
+        const previewImage = document.getElementById('previewImage');
+        let scale = 1;
+
+        zoomIn.addEventListener('click', (e) => {
+            e.preventDefault();
+            scale += 0.1;
+            previewImage.style.transform = `scale(${scale})`;
+        });
+
+        zoomOut.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (scale > 0.5) {
+                scale -= 0.1;
+                previewImage.style.transform = `scale(${scale})`;
+            }
+        });
+
+        // Loading state
+        document.querySelector('form').addEventListener('submit', function () {
+            const btn = document.getElementById('processBtn');
+            const loader = document.getElementById('confirmLoader');
+            const btnText = document.querySelector('.btn-text');
+
+            btn.disabled = true;
+            btnText.textContent = 'Analyzing...';
+            loader.style.display = 'block';
+        });
+    </script>
+</body>
+
+</html>
