@@ -1,6 +1,10 @@
-flask==2.0.1
+Flask==2.0.1
 deepface==0.0.79
-werkzeug==2.0.1
+Werkzeug==2.0.3  # Slightly newer version for security fixes
 gunicorn==20.1.0
 opencv-python-headless==4.5.5.64
-tensorflow
+tensorflow==2.8.0
+numpy==1.21.6    # Required by deepface and tensorflow
+pandas==1.3.5    # Required by deepface
+Pillow==9.0.1    # Required for image processing
+h5py==3.6.0      # Required by tensorflow
